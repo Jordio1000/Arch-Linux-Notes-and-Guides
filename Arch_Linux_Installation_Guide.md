@@ -9,6 +9,10 @@ I am going to assume a few things before we start the guide.
 4. You have disabled Secure Boot in your UEFI firmware setup utility (your motherboard BIOS).
 	- Arch Linux does not support Secure Boot directly out of the box, so you will either have to configure it during the setup process, or after installation. This guide just takes the easy route and disables it for the time being.
 5. You have done your research and understand why you're choosing to use btrfs, grub, encryption, and a subvolume for swap as these may not be the options for your situations or needs.
+
+**Note: Any time I put a you see a words between two stars \*like this\* that is a variable name and you can substitute it with whatever is applicable for you.**
+
+With that out of the way, please plug in your boot device, boot into the installer, and lets start.
 ## Connect to Internet 
 - If using Ethernet connection, it should automatically connect
 - To connect to wifi:
@@ -23,22 +27,25 @@ I am going to assume a few things before we start the guide.
 ## Set date-time/timezone
 1. `timedatectl list-timezones` to find timezones.
 2. `timedatectl set-timezone America/Chicago.`
+	- Set your timezone to whatever is applicable for you.
 3. `timedatectl set-ntp true`.
 ## Partition Disk [^1]
 1. Find disks you want to partition with `fdisk -l` or `lsblk.`
 	-  It is recommended to remove any unnecessary disks from device before installation and partitioning.
+	- The disk you are looking for should be something like `/dev/sdX` if you are using a sata ssd, or `/nvmeXn1` if you are using an NVME drive. I am using an NVME, so that is what the rest of the guide will refer to.
 2.  Run `cfdisk /dev/nvmeXn1` to enter into fdisk gui.
+	- **Triple check that you re using the correct drive. This process will wipe your drive and any data on that drive will become unrecoverable.**
 3.  Select gpt format.
 4.  Format 1M of disk to BIOS boot.
 	-  **This is a necessary partition when you are using full drive encryption**.[^7]
 5. Format 1G of disk to EFI system. [^11]
 6. Format rest of drive to Linux filesystem
-	-  A swap partition may be created before dedicating the rest of the disk space to the Linux filesystem if wanted.
+	-  A swap partition may be created before dedicating the rest of the disk space to the Linux filesystem if wanted. But I will not be making one here and instead using a swap subvolume.
 7.  Write the changes to disk.
 ## Encrypt Root Partition
 1. Run `cryptsetup luksFormat /dev/nvmeXn1pY` and set a strong password.
-2. Run `cryptsetup luksOpen /dev/nvmeXn1pY cryptroot` to unlock encrypted partition.
-	-  ***NOTE***: The name `cryptroot` at the end of this command can be anything. This the the name of your root directory of your unencrypted disk and will be referenced later.
+2. Run `cryptsetup luksOpen /dev/nvmeXn1pY *cryptroot*` to unlock encrypted partition.
+	-  The name `cryptroot` at the end of this command can be anything. This the the name of your root directory of your unencrypted disk and will be referenced later.
 ## Formating/Mounting Partitions and btrfs Subvols
 1. Run `mkfs.btrfs /dev/mapper/cryptroot` to format your Linux filesystem partition to btrfs.
 2. Run `mkfs.fat -F32 /dev/nvmeXn1pY` on your EFI system partition.
@@ -49,14 +56,14 @@ I am going to assume a few things before we start the guide.
 	**root**: `btrfs subvolume create @`  
 	**home**: `btrfs subvolume create @home`
 	**swap** `btrfs subvolume create @swap`
-	- ***NOTE***: The subvolume naming scheme with ****@**** is purposeful. Naming them this way is needed for Timeshift to recognize the subvolumes to be able to create snapshots.
+	- The subvolume naming scheme with ****@**** is purposeful. Naming them this way is needed for Timeshift to recognize the subvolumes to be able to create snapshots.
 6. Go back to root directory with `cd /`.
 7. unmount our mnt partition: `umount /mnt`.
 8. `cd` into `/mnt`.
 9. Create a directory for efi, home, and swap subvols with `mkdir efi home swap`.
-	- ***NOTE***: This may need to be done again after mounting root directory in step 10 as it seems to clear /mnt directory.
+	- This may need to be done again after mounting root directory in step 10 as it seems to clear /mnt directory.
 10. mount root subvolumes: `mount -o noatime,ssd,compress=zstd,space_cache=v2,discard=async,subvol=@ /dev/mapper/cryptroot /mnt`
-	- ***NOTE***: The options in this mount command are used to optimize the speed of btrfs.
+	- The options in this mount command are used to optimize the speed of btrfs.
 11. mount home subvolumes: `mount -o noatime,ssd,compress=zstd,space_cache=v2,discard=async,subvol=@home /dev/mapper/cryptroot /mnt/home`
 12. mount swap subvolumes: `mount -o noatime,ssd,compress=zstd,space_cache=v2,discard=async,subvol=@swap /dev/mapper/cryptroot /mnt/swap`
 13. mount our efi partition with `mount /dev/nvmeXn1pY /mnt/efi`.[^6]
@@ -74,8 +81,10 @@ I am going to assume a few things before we start the guide.
 2. Run `arch-chroot /mnt` to connect to the newly created linux environment.
 ## Local Date-time, Locale, Keymap, and Hostname
 1. `ln -sf /usr/share/zoneinfo/America/Chicago /etc/localtime` (this is in your system, not on the iso).
+	- Set it to your local timezone
 2. `hwclock --systohc` to synchronize clock.
-3. locale `vim /etc/locale.gen` uncomment your locale, write and exit and then run `locale-gen`.
+3. locale `vim /etc/locale.gen` find and uncomment your locale, write and exit and then run `locale-gen`.
+	- In Vim, you can type `/*your locale*` so you don't have to scroll through the entire file to find your locale.
 4. `echo "LANG=en_US.UTF-8" >> /etc/locale.conf` for locale.
 5. `echo "KEYMAP=us" >> /etc/vconsole.conf` for keyboard (select yours as appropriate).
 6. change the hostname `echo "*hostname*" >> /etc/hostname`.
@@ -98,8 +107,9 @@ I am going to assume a few things before we start the guide.
 3. `vim /etc/pacman.conf` to make a few modifications.
 	- Uncomment `[multilib]` and `Include = /etc/pacman.d/mirrorlist` below it to enable `multilib` repo. This is needed to install 32bit graphics drivers. [^4] 
 	- Uncomment `Color` and `VerbosePkgLists`, and add `ILoveCandy` in `#Misc options` to make pacman installations look better.
+		- All completely unnecessary, but I like it.
 4. Install `mesa lib32-mesa vulkan-radeon lib32-vulkan-radeon` for both 64 and 32 bit AMD GPU drivers. [^5]
-5. Install additional packages. There are a lot of packages so I will just list a number of them say and what they do. You don't need to install all of these, but they are recommended
+5. Install additional packages. There are a lot of packages so I will just list a number of them say and what they do. While not all of these are required, some are like `amd-ucode/intel-ucode` so I recommend installing all of these packages.
 ```
 # "git" to install the git vcs
 # "btrfs-progs" are user-space utilities for file system management ( needed to harness the potential of btrfs )
