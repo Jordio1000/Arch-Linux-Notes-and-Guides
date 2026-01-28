@@ -89,7 +89,7 @@ With that out of the way, please plug in your boot device, boot into the install
 5. `echo "KEYMAP=us" >> /etc/vconsole.conf` for keyboard (select yours as appropriate).
 6. change the hostname `echo "*hostname*" >> /etc/hostname`.
 	- \*hostname* can be anything you want it to be. 
-7. `vim /etc/hosts` to edit hostfile with ```
+7. `vim /etc/hosts` to edit hostfile with
    ```
    127.0.0.1    localhost
    ::1          localhost
