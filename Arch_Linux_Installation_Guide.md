@@ -76,6 +76,7 @@ With that out of the way, please plug in your boot device, boot into the install
 4. Make sure `/etc/fstab` is modified to include `/swap/swapfile none swap defaults 0 0`.
 ## Install Base Packages
 1. Run `pacstrap -K /mnt base base-devel linux linux-firmware linux-headers vim` to install the basic packages needed to initialize linux and allow the ability to chroot into it.
+	- Technically you only need `base` but at a minimum I recommend `base linux` and `linux-firmware` as the latter 2 are the linux kernel and firmware for common hardware. [^13]
 ## Generate fstab and chroot into system
 1. Run `genfstab -U -p /mnt >> /mnt/etc/fstab` to generate your fstab and pipe it into your fstab file.
 2. Run `arch-chroot /mnt` to connect to the newly created linux environment.
@@ -173,3 +174,4 @@ At this point you can exit `chroot` and reboot your system. If everything has go
 [^10]: https://wiki.archlinux.org/title/Dm-crypt/Encrypting_an_entire_system#Configuring_GRUB_2
 [^11]: https://wiki.archlinux.org/title/EFI_system_partition#Create_the_partition
 [^12]: https://wiki.archlinux.org/title/Users_and_groups#Group_list
+[^13]: https://wiki.archlinux.org/title/Installation_guide#Install_essential_packages
