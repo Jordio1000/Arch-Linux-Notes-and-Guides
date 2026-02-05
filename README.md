@@ -11,4 +11,4 @@ These are more free-form notes. Mostly guides on how to do things, but they are 
 - [Post Arch Install Notes](Post%20Arch%20Install%20Notes.md)
 	- Actually some useful stuff in here. Just didn't want to make individual guides for it all.
 - [Arch Linux Installation Notes](Arch%20Linux%20Installation%20Notes.md)
-	- ***NOT TO BE USED AS A GUIDE***: This was just my brain-dump notes while in the middle of the install process. The [Arch Linux Installation Guide](Arch%20Linux%20Installation%20Guide.md) is this, but actually reviewed and formatted. 
+	- ***NOT TO BE USED AS A GUIDE***: This was just my brain-dump notes while in the middle of the install process. The [Arch Linux Installation Guide](Arch%20Linux%20Installation%20Guide.md) is this, but actually reviewed and formatted.
