@@ -5,7 +5,7 @@ I am going to assume a few things before we start the guide.
 	- I personally used [Ventoy](https://wiki.archlinux.org/title/USB_flash_installation_medium#Using_Ventoy) as I had, a Ventoy drive already on hand, but the Arch Wiki guide for creating a boot drive is [here](https://wiki.archlinux.org/title/USB_flash_installation_medium#Using_manual_formatting).
 	- You can also just use [Rufus](https://rufus.ie/).
 2. You have experience and are comfortable working in a Linux terminal.
-3. You are using a 64-bit x64 UEFI system.
+3. You are using a 64-bit x86 UEFI system.
 4. You have disabled Secure Boot in your UEFI firmware setup utility (your motherboard BIOS).
 	- Arch Linux does not support Secure Boot directly out of the box, so you will either have to configure it during the setup process, or after installation. This guide just takes the easy route and disables it for the time being.
 5. You have done your research and understand why you're choosing to use btrfs, grub, encryption, and a subvolume for swap as these may not be the options for your situations or needs.
