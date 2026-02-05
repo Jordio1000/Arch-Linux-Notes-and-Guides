@@ -1,4 +1,4 @@
-This is mostly gonna be a brain dump of all the little things that I did or ran into after installing Arch. Includes some guides on how to do various things like installing enabling secure boot.
+This is mostly gonna be a brain dump of all the little things that I did or ran into after installing Arch. Includes some guides on how to do various things.
 
 ## Connect to Network
 - Make sure NetworkManager is installed and probably install iwd before rebooting into Arch. 
